@@ -1,0 +1,40 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "ninja",
+      "args": [
+        "-C",
+        "./build/Debug"
+      ],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "flash ( OpenOCD + CMSIS-DAP )",
+      "type": "shell",
+      "command": "openocd",
+      "args": [
+        "-f",
+        "interface/stlink.cfg",
+        "-f",
+        "target/stm32f4x.cfg",
+        "-c",
+        "'program ./build/Debug/${workspaceFolderBasename}.elf; reset; exit'"
+      ],
+      "dependsOn":[
+        "build"
+      ],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
