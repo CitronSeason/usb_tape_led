@@ -36,6 +36,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define MAX_LED 10
+#define PWM_DATA_SIZE (MAX_LED * 24) + 50  // 24bit/LED + 50個のリセットパルス
 
 /* USER CODE END PD */
 
@@ -48,6 +50,7 @@
 
 /* USER CODE BEGIN PV */
 
+static uint16_t s_pwmData[PWM_DATA_SIZE];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,6 +61,15 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void set_example_led_data() {
+  uint32_t rgb = 0x00FF00;  // 赤色の例 (0xGGRRBB形式で指定)
+  for (int i = 0; i < MAX_LED; i++) {
+    for (int bit = 23; bit >= 0; bit--) {
+      s_pwmData[i * 24 + (23 - bit)] = (rgb & (1 << bit)) ? 135 : 67; // '1'は135、'0'は120
+    }
+  }
+}
 
 /* USER CODE END 0 */
 
@@ -95,6 +107,10 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
+  set_example_led_data(); // LEDデータの設定
+  __HAL_TIM_MOE_ENABLE(&htim1); // メイン出力イネーブル
+  HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t*)s_pwmData, PWM_DATA_SIZE);
+
 
   /* USER CODE END 2 */
 
